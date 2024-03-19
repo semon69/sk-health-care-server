@@ -2,10 +2,12 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "../../../helpers/prisma";
 
 const getAllAdminFromDb = async (params: any) => {
-  console.log({ params });
+  //   console.log({ params });
+  const { searchTerm, ...filterData } = params;
 
   const andConditions: Prisma.AdminWhereInput[] = [];
   const adminSearchableField = ["name", "email"];
+
   //   [
   //     {
   //       name: {
@@ -20,7 +22,8 @@ const getAllAdminFromDb = async (params: any) => {
   //       },
   //     },
   //   ],
-  if (params.searchTerm) {
+
+  if (searchTerm) {
     andConditions.push({
       OR: adminSearchableField.map((field) => ({
         [field]: {
@@ -30,6 +33,17 @@ const getAllAdminFromDb = async (params: any) => {
       })),
     });
   }
+const filterDataArray = Object.keys(filterData)
+  if(filterDataArray.length > 0){
+    andConditions.push({
+        AND: filterDataArray.map(key => ({
+            [key]: {
+                equals: filterData[key],
+            }
+        }))
+    })
+  }
+
   const whereConditions: Prisma.AdminWhereInput = { AND: andConditions };
   //   console.dir(whereConditions, { depth: Infinity });
 
