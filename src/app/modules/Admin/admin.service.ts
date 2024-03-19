@@ -1,31 +1,23 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../../../helpers/prisma";
+import { adminSearchableFields } from "./admin.constant";
+import { calculatePagination } from "../../../helpers/paginationHelper";
 
-const getAllAdminFromDb = async (params: any) => {
+
+const getAllAdminFromDb = async (params: any, options: any) => {
   //   console.log({ params });
   const { searchTerm, ...filterData } = params;
 
-  const andConditions: Prisma.AdminWhereInput[] = [];
-  const adminSearchableField = ["name", "email"];
+//   console.log(searchTerm);
 
-  //   [
-  //     {
-  //       name: {
-  //         contains: params.searchTerm,
-  //         mode: "insensitive",
-  //       },
-  //     },
-  //     {
-  //       email: {
-  //         contains: params.searchTerm,
-  //         mode: "insensitive",
-  //       },
-  //     },
-  //   ],
+  const { limit, skip, sortBy, sortOrder } = calculatePagination(options);
+
+  const andConditions: Prisma.AdminWhereInput[] = [];
 
   if (searchTerm) {
+    // console.log(searchTerm);
     andConditions.push({
-      OR: adminSearchableField.map((field) => ({
+      OR: adminSearchableFields.map((field) => ({
         [field]: {
           contains: params.searchTerm,
           mode: "insensitive",
@@ -33,22 +25,38 @@ const getAllAdminFromDb = async (params: any) => {
       })),
     });
   }
-const filterDataArray = Object.keys(filterData)
-  if(filterDataArray.length > 0){
+  console.log(andConditions);
+
+  const filterDataArray = Object.keys(filterData);
+
+
+  if (filterDataArray.length > 0) {
     andConditions.push({
-        AND: filterDataArray.map(key => ({
-            [key]: {
-                equals: filterData[key],
-            }
-        }))
-    })
+      AND: filterDataArray.map((key) => ({
+        [key]: {
+          equals: filterData[key],
+        },
+      })),
+    });
   }
 
+  //   console.log(filterDataArray);
+
   const whereConditions: Prisma.AdminWhereInput = { AND: andConditions };
-  //   console.dir(whereConditions, { depth: Infinity });
+    console.dir(whereConditions, { depth: Infinity });
 
   const result = await prisma.admin.findMany({
     where: whereConditions,
+    skip,
+    // take: limit,
+    // orderBy:
+    //   sortBy && sortOrder
+    //     ? {
+    //         [sortBy]: sortOrder,
+    //       }
+    //     : {
+    //         createdAt: "desc",
+    //       },
   });
   return result;
 };
