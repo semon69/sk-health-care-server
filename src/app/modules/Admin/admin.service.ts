@@ -10,7 +10,7 @@ const getAllAdminFromDb = async (params: any, options: any) => {
 
 //   console.log(searchTerm);
 
-  const { limit, skip, sortBy, sortOrder } = calculatePagination(options);
+  const {page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
 
   const andConditions: Prisma.AdminWhereInput[] = [];
 
@@ -58,7 +58,19 @@ const getAllAdminFromDb = async (params: any, options: any) => {
     //         createdAt: "desc",
     //       },
   });
-  return result;
+  const total = await prisma.admin.count({
+    where: whereConditions
+  })
+
+  return {
+    meta: {
+      page,
+      limit,
+      total
+    },
+    data: result
+  }
+  ;
 };
 
 export const adminService = {
