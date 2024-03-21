@@ -1,11 +1,15 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { adminService } from "./admin.service";
 import { pick } from "../../../shared/pick";
 import { adminFilterableFields } from "./admin.constant";
 import sendResponse from "../../../helpers/sendResponse";
 import httpStatus from "http-status";
 
-const getAllAdminFromDb = async (req: Request, res: Response) => {
+const getAllAdminFromDb = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const filters = pick(req.query, adminFilterableFields);
     // console.log(filters);
@@ -21,19 +25,19 @@ const getAllAdminFromDb = async (req: Request, res: Response) => {
       data: result.data,
     });
   } catch (error) {
-    res.status(500).send({
-      success: false,
-      message: error?.name,
-      error,
-    });
+    next(error);
   }
 };
 
-const getByIdFromDB = async (req: Request, res: Response) => {
+const getByIdFromDB = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const result = await adminService.getByIdFromDB(id);
-    
+
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -41,15 +45,15 @@ const getByIdFromDB = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    res.status(500).send({
-      success: false,
-      message: error?.name,
-      error,
-    });
+    next(error);
   }
 };
 
-const updateDataIntoDB = async (req: Request, res: Response) => {
+const updateDataIntoDB = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const result = await adminService.updateDataIntoDB(id, req.body);
@@ -60,15 +64,15 @@ const updateDataIntoDB = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    res.status(500).send({
-      success: false,
-      message: error?.name,
-      error,
-    });
+    next(error);
   }
 };
 
-const deleteDataIntoDB = async (req: Request, res: Response) => {
+const deleteDataIntoDB = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const result = await adminService.deleteDataFromDB(id);
@@ -79,15 +83,15 @@ const deleteDataIntoDB = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    res.status(500).send({
-      success: false,
-      message: error?.name,
-      error,
-    });
+    next(error);
   }
 };
 
-const softDeleteDataIntoDB = async (req: Request, res: Response) => {
+const softDeleteDataIntoDB = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const result = await adminService.softDeleteDataFromDB(id);
@@ -98,11 +102,7 @@ const softDeleteDataIntoDB = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    res.status(500).send({
-      success: false,
-      message: error?.name,
-      error,
-    });
+    next(error);
   }
 };
 

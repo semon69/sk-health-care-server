@@ -1,24 +1,19 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { userServices } from "./user.service";
 import sendResponse from "../../../helpers/sendResponse";
 import httpStatus from "http-status";
 
-const createAdmin = async (req: Request, res: Response) => {
+const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await userServices.createAdmin(req.body);
-    sendResponse(res,{
+    sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: "Admin created successfully",
       data: result,
     });
-    
   } catch (error) {
-    res.status(500).send({
-      success: false,
-      message: error?.name,
-      error,
-    });
+    next(error);
   }
 };
 
