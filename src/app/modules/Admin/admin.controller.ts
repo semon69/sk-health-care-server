@@ -3,6 +3,7 @@ import { adminService } from "./admin.service";
 import { pick } from "../../../shared/pick";
 import { adminFilterableFields } from "./admin.constant";
 import sendResponse from "../../../helpers/sendResponse";
+import httpStatus from "http-status";
 
 const getAllAdminFromDb = async (req: Request, res: Response) => {
   try {
@@ -13,7 +14,7 @@ const getAllAdminFromDb = async (req: Request, res: Response) => {
 
     const result = await adminService.getAllAdminFromDb(filters, options);
     sendResponse(res, {
-      statusCode: 200,
+      statusCode: httpStatus.OK,
       success: true,
       message: "Admin data fetched successfully",
       meta: result.meta,
@@ -32,13 +33,9 @@ const getByIdFromDB = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const result = await adminService.getByIdFromDB(id);
-    // res.status(200).send({
-    //   success: true,
-    //   message: ,
-    //   data: result,
-    // });
+    
     sendResponse(res, {
-      statusCode: 200,
+      statusCode: httpStatus.OK,
       success: true,
       message: "An Admin data fetched successfully",
       data: result,
@@ -56,13 +53,8 @@ const updateDataIntoDB = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const result = await adminService.updateDataIntoDB(id, req.body);
-    // res.status(200).send({
-    //   success: true,
-    //   message: "Admin data updated successfully",
-    //   data: result,
-    // });
     sendResponse(res, {
-      statusCode: 200,
+      statusCode: httpStatus.OK,
       success: true,
       message: "Admin data updated successfully",
       data: result,
@@ -80,13 +72,8 @@ const deleteDataIntoDB = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const result = await adminService.deleteDataFromDB(id);
-    // res.status(200).send({
-    //   success: true,
-    //   message: 
-    //   data: result,
-    // });
     sendResponse(res, {
-      statusCode: 200,
+      statusCode: httpStatus.OK,
       success: true,
       message: "Admin data Deleted successfully",
       data: result,
@@ -105,7 +92,7 @@ const softDeleteDataIntoDB = async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await adminService.softDeleteDataFromDB(id);
     sendResponse(res, {
-      statusCode: 200,
+      statusCode: httpStatus.OK,
       success: true,
       message: "Admin data Deleted successfully",
       data: result,
