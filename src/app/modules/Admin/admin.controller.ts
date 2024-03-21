@@ -46,7 +46,26 @@ const getByIdFromDB = async(req: Request, res: Response)=> {
   }
 }
 
+const updateDataIntoDB = async(req: Request, res: Response)=> {
+  try {
+    const {id} = req.params;
+    const result = await adminService.updateDataIntoDB(id, req.body)
+    res.status(200).send({
+      success: true,
+      message: "Admin data updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: error?.name,
+      error,
+    });
+  }
+}
+
 export const adminController = {
   getAllAdminFromDb,
-  getByIdFromDB
+  getByIdFromDB,
+  updateDataIntoDB
 };
