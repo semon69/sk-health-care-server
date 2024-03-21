@@ -12,6 +12,6 @@ router.patch('/:id', adminController.updateDataIntoDB)
 
 router.delete('/:id', adminController.deleteDataIntoDB) 
 
-router.patch('/soft/:id', adminController.softDeleteDataIntoDB) 
+router.delete('/soft/:id', adminController.softDeleteDataIntoDB) 
 
 export const AdminRoutes = router

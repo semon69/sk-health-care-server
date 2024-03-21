@@ -24,7 +24,7 @@ const getAllAdminFromDb = async (params: any, options: any) => {
       })),
     });
   }
-  console.log(andConditions);
+  // console.log(andConditions);
 
   const filterDataArray = Object.keys(filterData);
 
@@ -38,10 +38,12 @@ const getAllAdminFromDb = async (params: any, options: any) => {
     });
   }
 
-  //   console.log(filterDataArray);
+  andConditions.push({
+    isDeleted: false,
+  });
 
   const whereConditions: Prisma.AdminWhereInput = { AND: andConditions };
-  console.dir(whereConditions, { depth: Infinity });
+  // console.dir(whereConditions, { depth: Infinity });
 
   const result = await prisma.admin.findMany({
     where: whereConditions,
@@ -74,12 +76,14 @@ const getByIdFromDB = async (id: string) => {
   await prisma.admin.findUniqueOrThrow({
     where: {
       id,
+      isDeleted: false,
     },
   });
 
   const result = await prisma.admin.findUnique({
     where: {
       id,
+      isDeleted: false,
     },
   });
   return result;
@@ -89,12 +93,14 @@ const updateDataIntoDB = async (id: string, data: Partial<Admin>) => {
   await prisma.admin.findUniqueOrThrow({
     where: {
       id,
+      isDeleted: false,
     },
   });
 
   const result = await prisma.admin.update({
     where: {
       id,
+      isDeleted: false,
     },
     data,
   });
@@ -107,36 +113,44 @@ const deleteDataFromDB = async (id: string) => {
     const deleteAdmin = await transactionClient.admin.delete({
       where: { id },
     });
-    const deleteUser = await transactionClient.user.delete({
+
+    await transactionClient.user.delete({
       where: {
         email: deleteAdmin.email,
       },
     });
-    return deleteAdmin
+    return deleteAdmin;
   });
-  return result
+  return result;
 };
 
 const softDeleteDataFromDB = async (id: string) => {
+  await prisma.admin.findUniqueOrThrow({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+
   const result = await prisma.$transaction(async (transactionClient) => {
     const deleteAdmin = await transactionClient.admin.update({
       where: { id },
       data: {
-        isDeleted: true
-      }
+        isDeleted: true,
+      },
     });
 
-    const deleteUser = await transactionClient.user.update({
+    await transactionClient.user.update({
       where: {
         email: deleteAdmin.email,
       },
       data: {
-        status: UserStatus.DELETED
-      }
+        status: UserStatus.DELETED,
+      },
     });
-    return deleteAdmin
+    return deleteAdmin;
   });
-  return result
+  return result;
 };
 
 export const adminService = {
@@ -144,5 +158,5 @@ export const adminService = {
   getByIdFromDB,
   updateDataIntoDB,
   deleteDataFromDB,
-  softDeleteDataFromDB
+  softDeleteDataFromDB,
 };
