@@ -3,8 +3,9 @@ import { prisma } from "../../../helpers/prisma";
 import { adminSearchableFields } from "./admin.constant";
 import { calculatePagination } from "../../../helpers/paginationHelper";
 import { TAdminFilterRequest } from "./admin.interfaces";
+import { TPaginationOptions } from "../../interfaces/pagination";
 
-const getAllAdminFromDb = async (params: TAdminFilterRequest, options: any) => {
+const getAllAdminFromDb = async (params: TAdminFilterRequest, options: TPaginationOptions) => {
   //   console.log({ params });
   const { searchTerm, ...filterData } = params;
 
@@ -33,7 +34,7 @@ const getAllAdminFromDb = async (params: TAdminFilterRequest, options: any) => {
     andConditions.push({
       AND: filterDataArray.map((key) => ({
         [key]: {
-          equals: filterData[key],
+          equals: (filterData as any)[key],
         },
       })),
     });

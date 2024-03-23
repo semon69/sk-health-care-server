@@ -1,0 +1,24 @@
+import { catchAsync } from "../../../helpers/catchAsync";
+import sendResponse from "../../../helpers/sendResponse";
+import { AuthService } from "./auth.services";
+
+const loginUser = catchAsync(async (req, res) => {
+  const result = await AuthService.loginUser(req.body);
+  const { refreshToken } = result;
+//   console.log(refreshToken);
+  res.cookie("refreshToken", refreshToken, { secure: false, httpOnly: true });
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Login successfull",
+    data: {
+        accessToken: result?.accessToken,
+        needPasswordChange: result?.needPasswordChange
+    },
+  });
+});
+
+export const AuthController = {
+  loginUser,
+};
