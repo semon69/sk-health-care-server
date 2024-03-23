@@ -2,8 +2,9 @@ import { Admin, Prisma, UserStatus } from "@prisma/client";
 import { prisma } from "../../../helpers/prisma";
 import { adminSearchableFields } from "./admin.constant";
 import { calculatePagination } from "../../../helpers/paginationHelper";
+import { TAdminFilterRequest } from "./admin.interfaces";
 
-const getAllAdminFromDb = async (params: any, options: any) => {
+const getAllAdminFromDb = async (params: TAdminFilterRequest, options: any) => {
   //   console.log({ params });
   const { searchTerm, ...filterData } = params;
 
