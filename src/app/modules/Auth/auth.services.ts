@@ -2,7 +2,8 @@ import { UserStatus } from "@prisma/client";
 import { jwtHelpers } from "../../../helpers/jwtHelperrs";
 import { prisma } from "../../../helpers/prisma";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { Secret } from "jsonwebtoken";
+import config from "../../config";
 
 const loginUser = async (payload: { email: string; password: string }) => {
   const userData = await prisma.user.findUniqueOrThrow({
@@ -25,8 +26,8 @@ const loginUser = async (payload: { email: string; password: string }) => {
       email: userData?.email,
       role: userData?.role,
     },
-    "abcdefg",
-    "5m"
+    config.jwt.secret as Secret,
+    config.jwt.expires_in as string
   );
 
   const refreshToken = jwtHelpers.generateToken(
@@ -34,8 +35,8 @@ const loginUser = async (payload: { email: string; password: string }) => {
       email: userData?.email,
       role: userData?.role,
     },
-    "abcdefghijk",
-    "30d"
+    config.jwt.refresh_secret as Secret,
+    config.jwt.refresh_expires_in as string
   );
 
   return {
@@ -49,7 +50,7 @@ const refreshToken = async (token: string) => {
   // console.log('refresh token', token);
   let decodedData;
   try {
-    decodedData = jwtHelpers.verifyToken(token,"abcdefghijk" )
+    decodedData = jwtHelpers.verifyToken(token,config.jwt.refresh_secret as Secret )
 
     // decodedData = jwt.verify(token, "abcdefghijk");
   } catch (error) {
@@ -68,8 +69,8 @@ const refreshToken = async (token: string) => {
       email: userData?.email,
       role: userData?.role,
     },
-    "abcdefg",
-    "5m"
+    config.jwt.secret as Secret,
+    config.jwt.expires_in as string
   );
 
   return {

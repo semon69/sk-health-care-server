@@ -6,17 +6,14 @@ import { TAdminFilterRequest } from "./admin.interfaces";
 import { TPaginationOptions } from "../../interfaces/pagination";
 
 const getAllAdminFromDb = async (params: TAdminFilterRequest, options: TPaginationOptions) => {
-  //   console.log({ params });
-  const { searchTerm, ...filterData } = params;
 
-  //   console.log(searchTerm);
+  const { searchTerm, ...filterData } = params;
 
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
 
   const andConditions: Prisma.AdminWhereInput[] = [];
 
   if (searchTerm) {
-    // console.log(searchTerm);
     andConditions.push({
       OR: adminSearchableFields.map((field) => ({
         [field]: {
@@ -26,7 +23,6 @@ const getAllAdminFromDb = async (params: TAdminFilterRequest, options: TPaginati
       })),
     });
   }
-  // console.log(andConditions);
 
   const filterDataArray = Object.keys(filterData);
 
@@ -50,15 +46,15 @@ const getAllAdminFromDb = async (params: TAdminFilterRequest, options: TPaginati
   const result = await prisma.admin.findMany({
     where: whereConditions,
     skip,
-    // take: limit,
-    // orderBy:
-    //   sortBy && sortOrder
-    //     ? {
-    //         [sortBy]: sortOrder,
-    //       }
-    //     : {
-    //         createdAt: "desc",
-    //       },
+    take: limit,
+    orderBy:
+      sortBy && sortOrder
+        ? {
+            [sortBy]: sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
   });
   const total = await prisma.admin.count({
     where: whereConditions,
