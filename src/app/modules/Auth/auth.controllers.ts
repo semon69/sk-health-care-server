@@ -1,6 +1,8 @@
+import { Request, Response } from "express";
 import { catchAsync } from "../../../helpers/catchAsync";
 import sendResponse from "../../../helpers/sendResponse";
 import { AuthService } from "./auth.services";
+import { any } from "zod";
 
 const loginUser = catchAsync(async (req, res) => {
   const result = await AuthService.loginUser(req.body);
@@ -35,7 +37,7 @@ const refreshToken = catchAsync(async (req, res) => {
   });
 });
 
-const changePassword = catchAsync(async (req, res) => {
+const changePassword = catchAsync(async (req: Request & {user?: any}, res: Response) => {
   const user = req?.user;
 
   const result = await AuthService.changePassword(user, req.body);
@@ -52,8 +54,34 @@ const changePassword = catchAsync(async (req, res) => {
   });
 });
 
+const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+
+  await AuthService.forgotPassword(req.body);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Check your email!",
+});
+});
+
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+
+  const token = req.headers.authorization || "";
+
+  await AuthService.resetPassword(token, req.body);
+
+  sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Account recovered!",
+  });
+});
+
 export const AuthController = {
   loginUser,
   refreshToken,
   changePassword,
+  forgotPassword,
+  resetPassword
 };

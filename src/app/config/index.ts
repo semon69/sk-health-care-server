@@ -12,5 +12,11 @@ export default {
     expires_in: process.env.EXPIRES_IN,
     refresh_secret: process.env.REFRESH_SECRET,
     refresh_expires_in: process.env.REFRESH_EXPIRES_IN,
+    reset_secret: process.env.RESET_SECRET,
+    reset_pass_expires_in: process.env.RESET_PASS_EXPIRES_IN,
+    reset_pass_link: process.env.RESET_PASS_LINK,
   },
+  email: process.env.EMAIL,
+  email_password: process.env.EMAIL_PASSWORD,
+  bycrypt_salt_rounds: process.env.BCRYPT_SALT_ROUND
 };
