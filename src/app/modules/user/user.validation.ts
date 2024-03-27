@@ -9,7 +9,24 @@ const createAdmin = z.object({
   }),
 });
 
+const createDoctor = z.object({
+  password: z.string(),
+  doctor: z.object({
+    email: z.string().email(),
+    name: z.string(),
+    contactNumber: z.string(),
+    address: z.string().nullable(),
+    registrationNumber: z.string(),
+    experience: z.number().int(),
+    gender: z.enum(["MALE", "FEMALE"]),
+    apointmentFee: z.number(),
+    qualification: z.string(),
+    currentWorkingPlace: z.string(),
+    designation: z.string(),
+  }),
+});
 
 export const userValidation = {
-    createAdmin
-}
+  createAdmin,
+  createDoctor,
+};
