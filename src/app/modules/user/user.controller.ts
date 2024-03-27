@@ -4,8 +4,9 @@ import sendResponse from "../../../helpers/sendResponse";
 import httpStatus from "http-status";
 
 const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
+
   try {
-    const result = await userServices.createAdmin(req.body);
+    const result = await userServices.createAdmin(req);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

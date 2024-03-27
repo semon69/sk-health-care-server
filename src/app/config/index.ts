@@ -18,5 +18,10 @@ export default {
   },
   email: process.env.EMAIL,
   email_password: process.env.EMAIL_PASSWORD,
-  bycrypt_salt_rounds: process.env.BCRYPT_SALT_ROUND
+  bycrypt_salt_rounds: process.env.BCRYPT_SALT_ROUND,
+  cloudinary: {
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET
+  }
 };
