@@ -2,6 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { userServices } from "./user.service";
 import sendResponse from "../../../helpers/sendResponse";
 import httpStatus from "http-status";
+import { catchAsync } from "../../../helpers/catchAsync";
+import { pick } from "../../../shared/pick";
+import { userFilterableFields } from "./user.constant";
 
 const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -48,8 +51,37 @@ const createPaitent = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
+const getAllFromDb = catchAsync(async (req, res) => {
+  const filters = pick(req.query, userFilterableFields);
+  const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
+  // console.log("options", options);
+
+  const result = await userServices.getAllFromDb(filters, options);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Users data fetched successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
+const changeUserStatus = catchAsync(async (req, res) => {
+  const id = req.params.id
+  const result = await userServices.changeUserStatus(id, req.body );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User status updated successfully",
+    data: result,
+  });
+});
+
+
 export const userController = {
   createAdmin,
   createDoctor,
-  createPaitent
+  createPaitent,
+  getAllFromDb,
+  changeUserStatus
 };
