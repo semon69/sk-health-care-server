@@ -8,6 +8,7 @@ import { Request } from "express";
 import { TPaginationOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../../helpers/paginationHelper";
 import { userSearchAbleFields } from "./user.constant";
+import { userInfo } from "os";
 
 const createAdmin = async (req: any) => {
   const file: TFile = req.file;
@@ -189,7 +190,54 @@ const changeUserStatus = async (id: string, status: string) => {
     },
     data: status,
   });
-  return updateData
+  return updateData;
+};
+
+const getMyProfile = async (user: any) => {
+  const userInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user.email,
+    },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      status: true,
+      needPasswordChange: true,
+    },
+  });
+
+
+  let profileData;
+  if (userInfo.role === UserRole.SUPER_ADMIN) {
+    profileData = await prisma.admin.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  } else if (userInfo.role === UserRole.ADMIN) {
+    profileData = await prisma.admin.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  } else if (userInfo.role === UserRole.DOCTOR) {
+    profileData = await prisma.doctor.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  } else if (userInfo.role === UserRole.PATIENT) {
+    profileData = await prisma.patient.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  }
+
+  return {
+    ...userInfo, ...profileData
+  }
 };
 
 export const userServices = {
@@ -198,4 +246,5 @@ export const userServices = {
   createPatient,
   getAllFromDb,
   changeUserStatus,
+  getMyProfile,
 };

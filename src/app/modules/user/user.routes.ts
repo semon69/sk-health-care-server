@@ -12,6 +12,12 @@ router.get(
   userController.getAllFromDb
 );
 
+router.get(
+  "/me",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+  userController.getMyProfile
+);
+
 router.patch(
   "/:id/status",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
