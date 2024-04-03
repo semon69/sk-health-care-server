@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { catchAsync } from "../../../helpers/catchAsync";
 import sendResponse from "../../../helpers/sendResponse";
 import { AuthService } from "./auth.services";
-import { any } from "zod";
 
 const loginUser = catchAsync(async (req, res) => {
   const result = await AuthService.loginUser(req.body);
