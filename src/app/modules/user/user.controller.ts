@@ -5,6 +5,7 @@ import httpStatus from "http-status";
 import { catchAsync } from "../../../helpers/catchAsync";
 import { pick } from "../../../shared/pick";
 import { userFilterableFields } from "./user.constant";
+import { TAuthUser } from "../../interfaces/common";
 
 const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -77,9 +78,9 @@ const changeUserStatus = catchAsync(async (req, res) => {
   });
 });
 
-const getMyProfile = catchAsync(async (req, res) => {
+const getMyProfile = catchAsync(async (req: Request & {user?: TAuthUser}, res) => {
   const user = req.user;
-  const result = await userServices.getMyProfile(user);
+  const result = await userServices.getMyProfile(user as TAuthUser);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -88,6 +89,18 @@ const getMyProfile = catchAsync(async (req, res) => {
   });
 });
 
+const updateMyProfile = catchAsync(async (req: Request & {user?: TAuthUser}, res) => {
+  const user = req.user
+  const result = await userServices.updateMyProfile(user as TAuthUser, req);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Updated successfully",
+    data: result,
+  });
+});
+
+ 
 
 export const userController = {
   createAdmin,
@@ -95,5 +108,6 @@ export const userController = {
   createPaitent,
   getAllFromDb,
   changeUserStatus,
-  getMyProfile
+  getMyProfile,
+  updateMyProfile
 };

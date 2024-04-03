@@ -9,6 +9,7 @@ import { TPaginationOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../../helpers/paginationHelper";
 import { userSearchAbleFields } from "./user.constant";
 import { userInfo } from "os";
+import { TAuthUser } from "../../interfaces/common";
 
 const createAdmin = async (req: any) => {
   const file: TFile = req.file;
@@ -193,10 +194,10 @@ const changeUserStatus = async (id: string, status: string) => {
   return updateData;
 };
 
-const getMyProfile = async (user: any) => {
+const getMyProfile = async (user: TAuthUser) => {
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
-      email: user.email,
+      email: user?.email,
     },
     select: {
       id: true,
@@ -206,7 +207,6 @@ const getMyProfile = async (user: any) => {
       needPasswordChange: true,
     },
   });
-
 
   let profileData;
   if (userInfo.role === UserRole.SUPER_ADMIN) {
@@ -236,8 +236,56 @@ const getMyProfile = async (user: any) => {
   }
 
   return {
-    ...userInfo, ...profileData
+    ...userInfo,
+    ...profileData,
+  };
+};
+
+const updateMyProfile = async (user: TAuthUser, req: Request) => {
+  const userInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user?.email,
+    },
+  });
+
+  const file = req.file as TFile;
+  if (file) {
+    const uploadToCloudinari = await fileUploaders.uploadToCloudinari(file);
+    req.body.profilePhoto = uploadToCloudinari?.secure_url;
   }
+
+  let profileData;
+
+  if (userInfo.role === UserRole.SUPER_ADMIN) {
+    profileData = await prisma.admin.update({
+      where: {
+        email: userInfo.email,
+      },
+      data: req.body,
+    });
+  } else if (userInfo.role === UserRole.ADMIN) {
+    profileData = await prisma.admin.update({
+      where: {
+        email: userInfo.email,
+      },
+      data: req.body,
+    });
+  } else if (userInfo.role === UserRole.DOCTOR) {
+    profileData = await prisma.doctor.update({
+      where: {
+        email: userInfo.email,
+      },
+      data: req.body,
+    });
+  } else if (userInfo.role === UserRole.PATIENT) {
+    profileData = await prisma.patient.update({
+      where: {
+        email: userInfo.email,
+      },
+      data: req.body,
+    });
+  }
+  return profileData;
 };
 
 export const userServices = {
@@ -247,4 +295,5 @@ export const userServices = {
   getAllFromDb,
   changeUserStatus,
   getMyProfile,
+  updateMyProfile,
 };
