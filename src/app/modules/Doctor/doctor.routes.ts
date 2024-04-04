@@ -12,20 +12,21 @@ router.get('/:id', auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR), 
 router.patch(
   "/:id",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR),
+  doctorController.updateIntoDB
 );
 
-// //task 5
-// router.delete(
-//   "/:id",
-//   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-//   DoctorController.deleteFromDB
-// );
+//task 5
+router.delete(
+  "/:id",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  doctorController.deleteFromDB
+);
 
-// // task 6
-// router.delete(
-//   "/soft/:id",
-//   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-//   DoctorController.softDelete
-// );
+// task 6
+router.delete(
+  "/soft/:id",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  doctorController.softDelete
+);
 
 export const DoctorRoutes = router;
