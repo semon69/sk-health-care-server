@@ -1,17 +1,17 @@
-import { Schedule } from "@prisma/client";
+import { Prisma, Schedule } from "@prisma/client";
 import { TPaginationOptions } from "../../interfaces/pagination";
 import { TAuthUser } from "../../interfaces/common";
 import { calculatePagination } from "../../../helpers/paginationHelper";
 import { prisma } from "../../../helpers/prisma";
 import { addHours, addMinutes, format } from "date-fns";
-import { TSchedule } from "./schedule.interface";
+import { TSchedule, TScheduleFilterRequest } from "./schedule.interface";
 
 // const convertDateTime = async (date: Date) => {
 //   const offset = date.getTimezoneOffset() * 60000;
 //   return new Date(date.getTime() + offset);
 // };
 
-const insertIntoDB = async (payload: TSchedule): Promise<Schedule[]>  => {
+const insertIntoDB = async (payload: TSchedule): Promise<Schedule[]> => {
   const { startDate, endDate, startTime, endTime } = payload;
 
   const interverlTime = 30;
@@ -139,7 +139,7 @@ const insertIntoDB = async (payload: TSchedule): Promise<Schedule[]>  => {
 // };
 
 const getAllFromDB = async (
-  filters: any,
+  filters: TScheduleFilterRequest,
   options: TPaginationOptions,
   user: TAuthUser
 ) => {
@@ -177,6 +177,54 @@ const getAllFromDB = async (
       }),
     });
   }
+  const whereConditions: Prisma.ScheduleWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const doctorsSchedules = await prisma.doctorSchedule.findMany({
+    where: {
+      doctor: {
+        email: user?.email,
+      },
+    },
+  });
+
+  const doctorScheduleIds = new Set(
+    doctorsSchedules.map((schedule) => schedule.scheduleId)
+  );
+
+  const result = await prisma.schedule.findMany({
+    where: {
+      ...whereConditions,
+      id: {
+        notIn: [...doctorScheduleIds],
+      },
+    },
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? { [options.sortBy]: options.sortOrder }
+        : {
+            createdAt: "desc",
+          },
+  });
+  const total = await prisma.schedule.count({
+    where: {
+      ...whereConditions,
+      id: {
+        notIn: [...doctorScheduleIds],
+      },
+    },
+  });
+
+  return {
+    meta: {
+      total,
+      page,
+      limit,
+    },
+    data: result,
+  };
 };
 
 const getByIdFromDB = async (id: string): Promise<Schedule | null> => {

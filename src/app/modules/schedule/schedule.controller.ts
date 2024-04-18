@@ -16,18 +16,18 @@ const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
-  const filters = pick(req.query, ['startDate', 'endDate']);
+const getAllFromDB = catchAsync(async (req: Request & { user?: TAuthUser }, res: Response) => {
+  const filters = pick(req.query, ['startDate','endDate']);
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
   const user = req.user;
-  const result = await ScheduleService.getAllFromDB(filters, options, user);
+  const result = await ScheduleService.getAllFromDB(filters, options, user as TAuthUser);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Schedule retrieval successfully',
-    // meta: result.meta,
-    // data: result.data,
-    data: result
+    meta: result.meta,
+    data: result.data,
+    // data: result
   });
 });
 
