@@ -67,6 +67,8 @@ model Doctor {
   doctorSpecialities DoctorSpecialities[]
   doctorSchedule     DoctorSchedule[]
   Appointment        Appointment[]
+  prescription       Prescription[]
+  review             Review[]
 }
 
 model Patient {
@@ -83,6 +85,8 @@ model Patient {
   patientHelthData PatientHelthData?
   medicalReport    MedicalReport[]
   Appointment      Appointment[]
+  prescription     Prescription[]
+  review           Review[]
 
   @@map("patients")
 }
@@ -193,7 +197,8 @@ model Appointment {
   updatedAt      DateTime          @updatedAt
   doctorSchedule DoctorSchedule?
   payment        Payment?
-
+  prescription   Prescription?
+  review         Review?
   @@map("appointments")
 }
 
@@ -207,6 +212,44 @@ model Payment {
   paymentGatewayData Json?
 
   @@map("payments")
+}
+
+model Prescription {
+  id       String @id @default(uuid())
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+
+  followUpDate DateTime?
+  instructions String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("prescriptions")
+}
+
+model Review {
+  id       String @id @default(uuid())
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+
+  rating    Float
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("reviews")
 }
 
 enum UserRole {
