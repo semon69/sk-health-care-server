@@ -6,10 +6,10 @@ import { prisma } from "../../../helpers/prisma";
 import { addHours, addMinutes, format } from "date-fns";
 import { TSchedule, TScheduleFilterRequest } from "./schedule.interface";
 
-// const convertDateTime = async (date: Date) => {
-//   const offset = date.getTimezoneOffset() * 60000;
-//   return new Date(date.getTime() + offset);
-// };
+const convertDateTime = async (date: Date) => {
+  const offset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() + offset);
+};
 
 const insertIntoDB = async (payload: TSchedule): Promise<Schedule[]> => {
   const { startDate, endDate, startTime, endTime } = payload;
@@ -42,19 +42,18 @@ const insertIntoDB = async (payload: TSchedule): Promise<Schedule[]> => {
     );
 
     while (startDateTime < endDateTime) {
-      //   const s = await convertDateTime(startDateTime);
-      //   const e = await convertDateTime(addMinutes(startDateTime, interverlTime));
+        const s = await convertDateTime(startDateTime);
+        const e = await convertDateTime(addMinutes(startDateTime, interverlTime));
 
-      //   const scheduleData = {
-      //     startDate: s,
-      //     endDate: e,
-      //   };
-      const scheduleData = {
-        startDate: startDateTime,
-        endDate: addMinutes(startDateTime, interverlTime),
-      };
+        const scheduleData = {
+          startDate: s,
+          endDate: e,
+        };
+      // const scheduleData = {
+      //   startDate: startDateTime,
+      //   endDate: addMinutes(startDateTime, interverlTime),
+      // };
 
-      console.log(scheduleData);
 
       const existingSchedule = await prisma.schedule.findFirst({
         where: {
